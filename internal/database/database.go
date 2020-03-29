@@ -59,30 +59,44 @@ func CreateLikesTable() error {
 	return err
 }
 
-func CheckUserExists(username string) (bool, error) {
-	found := false
+func CreateBlacklistTable() error {
+	statement, err := db.Prepare(`CREATE TABLE IF NOT EXISTS "blacklist" (
+		"refreshTokenString"	TEXT,
+		PRIMARY KEY("refreshTokenString")
+	);`)
+	statement.Exec()
 
-	rows, err := db.Query("SELECT username FROM users")
+	return err
+}
+
+func FindUser(username string) (*core.User, error) {
+	var user *core.User
+
+	rows, err := db.Query("SELECT * FROM users")
 
 	if err != nil {
-		return found, err
+		return user, err
 	}
 
-	var u string
+	var dbUsername string
+	var dbPassword string
 
-	for rows.Next() && !found {
-		err := rows.Scan(&u)
+	for rows.Next() && user == nil {
+		err := rows.Scan(&dbUsername, &dbPassword)
 
 		if err != nil {
-			return found, err
+			return user, err
 		}
 
-		if u == username {
-			found = true
+		if username == dbUsername {
+			user = &core.User{
+				Username: dbUsername,
+				Password: dbPassword,
+			}
 		}
 	}
 
-	return found, nil
+	return user, nil
 }
 
 func AddUser(user *core.User) error {
@@ -93,4 +107,34 @@ func AddUser(user *core.User) error {
 	statement.Exec(user.Username, user.Password)
 
 	return nil
+}
+
+func BlacklistToken(token string) error {
+	statement, err := db.Prepare("INSERT INTO blaclist values (?)")
+	if err != nil {
+		return err
+	}
+	statement.Exec(token)
+
+	return nil
+}
+
+func FindToken(token string) (bool, error) {
+	found := false
+	rows, err := db.Query("SELECT * FROM blacklist")
+	if err != nil {
+		return false, err
+	}
+
+	var dbToken string
+	for rows.Next() && !found {
+		if err := rows.Scan(&dbToken); err != nil {
+			return false, err
+		}
+		if dbToken == token {
+			found = true
+		}
+	}
+
+	return found, nil
 }

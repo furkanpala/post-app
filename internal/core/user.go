@@ -15,3 +15,7 @@ func (u *User) HashPassword() error {
 	u.Password = string(hashedPassword)
 	return nil
 }
+
+func (u *User) Compare(password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+}

@@ -31,11 +31,15 @@ func main() {
 	//TODO: Handle error
 	_ = database.CreateLikesTable()
 
+	//TODO: Handle error
+	_ = database.CreateBlacklistTable()
+
 	router := mux.NewRouter()
 	// router.Handle("/", handlers.RouteHandler(handlers.GetIndex)).Methods("GET")
-	// router.Handle("/login", handlers.HandleLogin).Methods("POST")
+	router.Handle("/login", handlers.RouteHandler(handlers.HandleLogin)).Methods("POST")
 	router.Handle("/register", handlers.RouteHandler(handlers.HandleRegister)).Methods("POST")
-	// router.HandleFunc("/logout", handleLogout).Methods("POST")
+	router.Handle("/token", handlers.RouteHandler(handlers.RefreshToken)).Methods("POST")
+	router.HandleFunc("/token/logout", handlers.RouteHandler(handlers.HandleLogout)).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }
