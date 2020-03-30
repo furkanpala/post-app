@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/furkanpala/post-app/internal/database"
-	handlers "github.com/furkanpala/post-app/internal/http"
+	"github.com/furkanpala/post-app/internal/http/handlers"
 
 	"github.com/gorilla/mux"
 )
@@ -39,7 +39,7 @@ func main() {
 	router.Handle("/login", handlers.RouteHandler(handlers.HandleLogin)).Methods("POST")
 	router.Handle("/register", handlers.RouteHandler(handlers.HandleRegister)).Methods("POST")
 	router.Handle("/token", handlers.RouteHandler(handlers.RefreshToken)).Methods("POST")
-	// router.HandleFunc("/token/logout", handlers.RouteHandler(handlers.HandleLogout)).Methods("POST")
+	router.Handle("/token/logout", handlers.RouteHandler(handlers.HandleLogout)).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }

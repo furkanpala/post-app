@@ -1,4 +1,4 @@
-package handlers
+package httperror
 
 type HTTPError struct {
 	Cause error        `json:"-"`

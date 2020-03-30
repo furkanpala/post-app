@@ -1,4 +1,4 @@
-package handlers
+package response
 
 type SuccessfulLoginResponse struct {
 	AccessToken string `json:"access_token"`

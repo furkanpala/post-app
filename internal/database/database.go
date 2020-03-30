@@ -4,11 +4,12 @@ import (
 	"database/sql"
 
 	"github.com/furkanpala/post-app/internal/core"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3" // SQLite driver
 )
 
 var db *sql.DB
 
+// OpenDatabase function opens the database file in root directory of project
 func OpenDatabase() error {
 	var err error
 	db, err = sql.Open("sqlite3", "./post-app.db")
@@ -21,6 +22,8 @@ func CloseDatabase() error {
 	return err
 }
 
+// CreateUsersTable function creates users table if it does not exist
+// users table stores the username and password
 func CreateUsersTable() error {
 	statement, err := db.Prepare(`CREATE TABLE IF NOT EXISTS "users" (
 		"username"	TEXT,
@@ -32,6 +35,8 @@ func CreateUsersTable() error {
 	return err
 }
 
+// CreatePostsTable function creates posts table if it does not exist
+// posts table stores the context and writer of posts
 func CreatePostsTable() error {
 	statement, err := db.Prepare(`CREATE TABLE IF NOT EXISTS "posts" (
 		"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,6 +51,8 @@ func CreatePostsTable() error {
 	return err
 }
 
+// CreateLikesTable function creates likes table if it does not exist
+// likes table stores the posts and users who liked that post
 func CreateLikesTable() error {
 	statement, err := db.Prepare(`CREATE TABLE IF NOT EXISTS "likes" (
 		"user_liked"	TEXT,
@@ -59,6 +66,8 @@ func CreateLikesTable() error {
 	return err
 }
 
+// CreateBlacklistTable function creates blacklist table if it does not exist
+// blacklist table is used for revoking refresh tokens
 func CreateBlacklistTable() error {
 	statement, err := db.Prepare(`CREATE TABLE IF NOT EXISTS "blacklist" (
 		"jti"	TEXT,
@@ -70,13 +79,16 @@ func CreateBlacklistTable() error {
 	return err
 }
 
+// FindUser function searches database for a specific user.
+// Returns a pointer to the core.User if it finds
+// nil otherwise.
 func FindUser(username string) (*core.User, error) {
 	var user *core.User
 
 	rows, err := db.Query("SELECT * FROM users")
 
 	if err != nil {
-		return user, err
+		return nil, err
 	}
 
 	var dbUsername string
@@ -86,7 +98,7 @@ func FindUser(username string) (*core.User, error) {
 		err := rows.Scan(&dbUsername, &dbPassword)
 
 		if err != nil {
-			return user, err
+			return nil, err
 		}
 
 		if username == dbUsername {
@@ -111,7 +123,7 @@ func AddUser(user *core.User) error {
 }
 
 func BlacklistToken(jti string, expiresAt int64) error {
-	statement, err := db.Prepare("INSERT INTO blaclist values (?,?)")
+	statement, err := db.Prepare("INSERT INTO blacklist values (?,?)")
 	if err != nil {
 		return err
 	}
