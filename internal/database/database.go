@@ -61,8 +61,9 @@ func CreateLikesTable() error {
 
 func CreateBlacklistTable() error {
 	statement, err := db.Prepare(`CREATE TABLE IF NOT EXISTS "blacklist" (
-		"refreshTokenString"	TEXT,
-		PRIMARY KEY("refreshTokenString")
+		"jti"	TEXT,
+		"expiresAt"	INTEGER NOT NULL,
+		PRIMARY KEY("jti")
 	);`)
 	statement.Exec()
 
@@ -109,29 +110,29 @@ func AddUser(user *core.User) error {
 	return nil
 }
 
-func BlacklistToken(token string) error {
-	statement, err := db.Prepare("INSERT INTO blaclist values (?)")
+func BlacklistToken(jti string, expiresAt int64) error {
+	statement, err := db.Prepare("INSERT INTO blaclist values (?,?)")
 	if err != nil {
 		return err
 	}
-	statement.Exec(token)
+	statement.Exec(jti, expiresAt)
 
 	return nil
 }
 
-func FindToken(token string) (bool, error) {
+func FindJTI(jti string) (bool, error) {
 	found := false
-	rows, err := db.Query("SELECT * FROM blacklist")
+	rows, err := db.Query("SELECT jti FROM blacklist")
 	if err != nil {
 		return false, err
 	}
 
-	var dbToken string
+	var dbJti string
 	for rows.Next() && !found {
-		if err := rows.Scan(&dbToken); err != nil {
+		if err := rows.Scan(&dbJti); err != nil {
 			return false, err
 		}
-		if dbToken == token {
+		if dbJti == jti {
 			found = true
 		}
 	}
