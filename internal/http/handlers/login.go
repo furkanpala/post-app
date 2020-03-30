@@ -82,7 +82,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 	return nil
 }
 
-// validateUser function checks if user's credentials valid for log in
+// validateUser function checks if user's credentials are valid for log in
 func validateUser(user *core.User) *httperror.HTTPError {
 	// Check if user exists in database
 	dbUser, err := database.FindUser(user.Username)
