@@ -112,6 +112,7 @@ func FindUser(username string) (*core.User, error) {
 	return user, nil
 }
 
+// AddUser function adds the username and password into users table in database.
 func AddUser(user *core.User) error {
 	statement, err := db.Prepare("INSERT INTO users(username,password) values (?, ?)")
 	if err != nil {
@@ -122,6 +123,8 @@ func AddUser(user *core.User) error {
 	return nil
 }
 
+// BlacklistToken function expects a string, jti, and int64, expire time.
+// Adds jti and expire time of the JWT into blacklist table in database.
 func BlacklistToken(jti string, expiresAt int64) error {
 	statement, err := db.Prepare("INSERT INTO blacklist values (?,?)")
 	if err != nil {
@@ -132,6 +135,7 @@ func BlacklistToken(jti string, expiresAt int64) error {
 	return nil
 }
 
+// FindJTI function searches the given jti string in database.
 func FindJTI(jti string) (bool, error) {
 	found := false
 	rows, err := db.Query("SELECT jti FROM blacklist")
