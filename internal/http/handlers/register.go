@@ -94,6 +94,9 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) *httperror.HTTPError
 		}
 	}
 
+	// User created
+	w.WriteHeader(201)
+
 	// Register successful
 
 	return nil

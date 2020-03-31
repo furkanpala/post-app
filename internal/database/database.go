@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/furkanpala/post-app/internal/core"
 	_ "github.com/mattn/go-sqlite3" // SQLite driver
@@ -43,7 +44,7 @@ func CreatePostsTable() error {
 		"title"	TEXT NOT NULL,
 		"content"	TEXT NOT NULL,
 		"sent_by"	TEXT NOT NULL,
-		"date_added"	TEXT NOT NULL,
+		"date_added"	INTEGER NOT NULL,
 		FOREIGN KEY("sent_by") REFERENCES "users"("username")
 	);`)
 	statement.Exec()
@@ -154,4 +155,57 @@ func FindJTI(jti string) (bool, error) {
 	}
 
 	return found, nil
+}
+
+// CountPosts function returns the number of posts in database
+func CountPosts() (int, error) {
+	rows, err := db.Query("SELECT COUNT(*) FROM posts")
+	if err != nil {
+		return 0, err
+	}
+	var count int
+
+	for rows.Next() {
+		if err := rows.Scan(&count); err != nil {
+			return count, err
+		}
+	}
+
+	return count, nil
+}
+
+// GetAllPosts returns all the posts inside database
+func GetAllPosts() ([]core.Post, error) {
+	count, err := CountPosts()
+	if err != nil {
+		return nil, err
+	}
+
+	posts := make([]core.Post, count)
+
+	rows, err := db.Query("SELECT * FROM posts")
+	if err != nil {
+		return nil, err
+	}
+
+	var post core.Post
+
+	for rows.Next() {
+		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.User, &post.Date); err != nil {
+			return posts, err
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
+
+func AddPost(post *core.Post) error {
+	statement, err := db.Prepare("INSERT INTO posts(title,content,sent_by,date_added) values(?,?,?,?)")
+	if err != nil {
+		return err
+	}
+
+	statement.Exec(post.Title, post.Content, post.User, time.Now().Unix())
+	return nil
 }
