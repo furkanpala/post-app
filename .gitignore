@@ -1,0 +1,8 @@
+.DS_Store
+post-app.db
+/bin
+.vscode
+web/post-app/dist
+web/post-app/node_modules
+web/post-app/.DS_Store
+
