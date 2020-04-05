@@ -24,7 +24,7 @@ func (fn RouteHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Parse error: %v", parseError)
 		return
 	}
-	if err != nil {
+	if err.Cause != nil {
 		fmt.Printf("%v\n", err.Cause)
 	}
 	w.Header().Set("Content-Type", "application/json")

@@ -46,18 +46,4 @@ a {
   flex-direction: column;
   min-height: 100%;
 }
-
-/* .content-text {
-  font-size: 21px;
-  font-weight: 400;
-  word-break: break-word;
-  line-height: 1.58;
-  color: rgba(0, 0, 0, 0.84);
-}
-
-.title-text {
-}
-
-.caption-text {
-} */
 </style>

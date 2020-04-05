@@ -1,7 +1,6 @@
 package httphandlers
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -42,7 +41,6 @@ func HandleLogout(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 			Code: 500,
 		}
 	}
-	fmt.Printf("logout: %v\n", isInBlacklist)
 
 	if isInBlacklist {
 		return &httperror.HTTPError{

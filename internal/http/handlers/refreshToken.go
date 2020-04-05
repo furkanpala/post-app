@@ -2,7 +2,6 @@ package httphandlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -76,8 +75,6 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 		}
 	}
 
-	fmt.Printf("refresh: %v\n", isInBlacklist)
-
 	// If token's jti is in blacklist,
 	// meaning that if token is already revoked,
 	// returns Unauthorized error
@@ -117,8 +114,6 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 			Code: 500,
 		}
 	}
-
-	fmt.Println("success")
 
 	// Set headers according to OAuth 2.0
 	w.Header().Set("Content-Type", "application/json")

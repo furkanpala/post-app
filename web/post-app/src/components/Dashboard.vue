@@ -39,8 +39,6 @@ import axios from "axios";
 import Post from "./Post";
 import PostOverlay from "./PostOverlay";
 
-axios.defaults.baseURL = "http://localhost:3000";
-
 export default {
   name: "Dashboard",
   components: {

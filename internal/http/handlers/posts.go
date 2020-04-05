@@ -2,7 +2,6 @@ package httphandlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,7 +17,6 @@ import (
 const PostsPerPage = 6
 
 func GetPosts(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
-	fmt.Println("getposts")
 	posts, err := database.GetAllPosts()
 	if err != nil {
 		return &httperror.HTTPError{
@@ -196,7 +194,6 @@ func GetPostsAmount(w http.ResponseWriter, r *http.Request) *httperror.HTTPError
 			Code: 500,
 		}
 	}
-	fmt.Println(count)
 
 	responseBody := response.PostsResponse{
 		Posts: nil,
