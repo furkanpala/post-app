@@ -52,21 +52,6 @@ func CreatePostsTable() error {
 	return err
 }
 
-// CreateLikesTable function creates likes table if it does not exist
-// likes table stores the posts and users who liked that post
-func CreateLikesTable() error {
-	statement, err := db.Prepare(`CREATE TABLE IF NOT EXISTS "likes" (
-		"user_liked"	TEXT,
-		"post_liked"	INTEGER,
-		FOREIGN KEY("user_liked") REFERENCES "users"("username"),
-		PRIMARY KEY("user_liked","post_liked"),
-		FOREIGN KEY("post_liked") REFERENCES "posts"("id")
-	);`)
-	statement.Exec()
-
-	return err
-}
-
 // CreateBlacklistTable function creates blacklist table if it does not exist
 // blacklist table is used for revoking refresh tokens
 func CreateBlacklistTable() error {
@@ -195,6 +180,7 @@ func GetAllPosts() ([]core.Post, error) {
 	return posts, nil
 }
 
+// AddPost adds a post to dataabse
 func AddPost(post *core.Post) error {
 	statement, err := db.Prepare("INSERT INTO posts(title,content,sent_by,date_added) values(?,?,?,?)")
 	if err != nil {

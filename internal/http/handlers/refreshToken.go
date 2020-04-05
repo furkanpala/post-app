@@ -90,7 +90,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 	}
 
 	// Generate access token with 15 minutes of expire time
-	accessTokenString, err := jwttoken.GenerateToken(15*time.Second, claims.Username, env.AccessTokenSecret)
+	accessTokenString, err := jwttoken.GenerateToken(15*time.Minute, claims.Username, env.AccessTokenSecret)
 	if err != nil {
 		return &httperror.HTTPError{
 			Cause: err,
