@@ -1,4 +1,4 @@
-package handlers
+package httphandlers
 
 import (
 	"encoding/json"
@@ -15,7 +15,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const PostsPerPage = 10
+const PostsPerPage = 6
 
 func GetPosts(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 	fmt.Println("getposts")
@@ -52,7 +52,6 @@ func GetPosts(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 
 // GetPostsOnPage returns a slice of posts which are on a specific page.
 func GetPostsOnPage(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
-	fmt.Println("getpostsonpage")
 	params := mux.Vars(r)
 	page, err := strconv.Atoi(params["page"])
 	if err != nil {
@@ -118,7 +117,6 @@ func GetPostsOnPage(w http.ResponseWriter, r *http.Request) *httperror.HTTPError
 			Code: 500,
 		}
 	}
-
 	posts = posts[firstPostIndex : lastPostIndex+1]
 
 	responseBody := response.PostsResponse{
@@ -149,9 +147,27 @@ func AddPost(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 	username := context.Get(r, "username")
 	post.User = username.(string)
 
-	fmt.Println(post)
-	// TODO: Trim ekle
-	// TODO: Field validation ekle
+	errorMessage := ""
+	if len(post.Title) == 0 {
+		errorMessage += "Title required"
+	}
+	if len(post.Content) == 0 {
+		if errorMessage != "" {
+			errorMessage += "|"
+		}
+		errorMessage += "Content required"
+	}
+
+	if errorMessage != "" {
+		return &httperror.HTTPError{
+			Cause: nil,
+			Info: httperror.ErrorMessage{
+				Title:  "Invalid post info",
+				Detail: errorMessage,
+			},
+			Code: 400,
+		}
+	}
 
 	if err := database.AddPost(&post); err != nil {
 		return &httperror.HTTPError{
@@ -164,6 +180,39 @@ func AddPost(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 		}
 	}
 	w.WriteHeader(201)
+
+	return nil
+}
+
+func GetPostsAmount(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
+	count, err := database.CountPosts()
+	if err != nil {
+		return &httperror.HTTPError{
+			Cause: err,
+			Info: httperror.ErrorMessage{
+				Title:  "Internal server error",
+				Detail: err.Error(),
+			},
+			Code: 500,
+		}
+	}
+	fmt.Println(count)
+
+	responseBody := response.PostsResponse{
+		Posts: nil,
+		Count: count,
+	}
+
+	if err := json.NewEncoder(w).Encode(responseBody); err != nil {
+		return &httperror.HTTPError{
+			Cause: err,
+			Info: httperror.ErrorMessage{
+				Title:  "Internal server error",
+				Detail: err.Error(),
+			},
+			Code: 500,
+		}
+	}
 
 	return nil
 }

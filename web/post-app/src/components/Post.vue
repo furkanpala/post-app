@@ -1,17 +1,17 @@
 <template>
-  <div class="post">
+  <div class="post" @click="openOverlay">
     <div class="post-info">
-      <span class="post-info-title">Merhaba Dünya</span>
+      <span class="post-info-title">{{ title }}</span>
       <!-- ilk 20 karakter tablet pc-->
       <!-- ilk 40 karakter mobil -->
       <div>
-        <span class="post-info-writer">by Furkanpala</span>
-        <span class="post-info-date">29/10/2019 UTC</span>
+        <span class="post-info-writer">by {{ writer }}</span>
+        <span class="post-info-date">{{ date }}</span>
       </div>
     </div>
-    <p
-      class="post-content"
-    >elit, sed do eiusmodelit, sed do eiusmodelit, sed do eiusmodelit, sed do eiusmodelit, sed do eiusmodelit, sed do eiusmodelit, sed do eiusmodelit, sed</p>
+    <p class="post-content">
+      {{ content }}
+    </p>
     <!-- ilk 100 karakter tablet pc-->
     <!-- ilk 150 karakter mobil-->
   </div>
@@ -19,11 +19,44 @@
 
 <script>
 export default {
-  name: "Post"
+  name: "Post",
+  props: {
+    post: Object,
+  },
+  data() {
+    return {
+      writer: this.post.user,
+      windowWidth: window.innerWidth,
+    };
+  },
+
+  methods: {
+    openOverlay() {
+      this.$emit("openOverlay", this.post.id);
+    },
+  },
+
+  computed: {
+    title() {
+      if (this.windowWidth < 700) {
+        return this.post.title.substr(0, 40);
+      }
+      return this.post.title.substr(0, 20);
+    },
+    content() {
+      if (this.windowWidth < 700) {
+        return this.post.content.substr(0, 150);
+      }
+      return this.post.content.substr(0, 100);
+    },
+    date() {
+      return new Date(this.post.date * 1000).toDateString();
+    },
+  },
 };
 </script>
 
-<style scoped>
+<style>
 .post {
   display: flex;
   padding: 1rem;
@@ -50,11 +83,7 @@ export default {
   justify-content: space-around;
 }
 
-.post-info-writer {
-  font-size: 0.75em;
-  color: rgba(0, 0, 0, 0.5);
-}
-
+.post-info-writer,
 .post-info-date {
   font-size: 0.75em;
   color: rgba(0, 0, 0, 0.5);

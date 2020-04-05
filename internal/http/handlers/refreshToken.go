@@ -1,4 +1,4 @@
-package handlers
+package httphandlers
 
 import (
 	"encoding/json"
@@ -18,12 +18,10 @@ import (
 // Verifies the incoming refresh token.
 // If it is valid, then responses with a new refresh and an access token
 func RefreshToken(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
-
 	cookie, httpErr := jwttoken.ParseCookie(r, "jid")
 	if httpErr != nil {
 		return httpErr
 	}
-
 	claims := &jwttoken.Claims{}
 
 	token, err := jwt.ParseWithClaims(cookie.Value, claims, func(tkn *jwt.Token) (interface{}, error) {
@@ -95,7 +93,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 	}
 
 	// Generate access token with 15 minutes of expire time
-	accessTokenString, err := jwttoken.GenerateToken(15*time.Minute, claims.Username, env.AccessTokenSecret)
+	accessTokenString, err := jwttoken.GenerateToken(15*time.Second, claims.Username, env.AccessTokenSecret)
 	if err != nil {
 		return &httperror.HTTPError{
 			Cause: err,
@@ -120,6 +118,8 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 		}
 	}
 
+	fmt.Println("success")
+
 	// Set headers according to OAuth 2.0
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-store")
@@ -136,7 +136,6 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 		Value:    refreshTokenString,
 		Expires:  time.Now().Add(168 * time.Hour),
 		HttpOnly: true,
-		Path:     "/token",
 	}
 	http.SetCookie(w, &newCookie)
 	json.NewEncoder(w).Encode(responseBody)

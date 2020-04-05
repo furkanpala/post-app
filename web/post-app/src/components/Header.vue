@@ -4,19 +4,37 @@
       <router-link to="/">PostApp</router-link>
     </span>
     <nav class="header-nav">
-      <span class="nav-item">
+      <span class="nav-item" v-if="!isLoggedIn">
         <router-link to="/login">Login</router-link>
       </span>
-      <span class="nav-item">
+      <span class="nav-item" v-if="!isLoggedIn">
         <router-link to="/register">Register</router-link>
       </span>
+      <span class="nav-item" v-if="isLoggedIn">
+        <router-link to="/add">Add Post</router-link>
+      </span>
+      <span class="nav-item nav-logout" v-if="isLoggedIn" @click="logout"
+        >Logout</span
+      >
     </nav>
   </header>
 </template>
 
 <script>
 export default {
-  name: "Header"
+  name: "Header",
+  computed: {
+    isLoggedIn() {
+      return this.$store.getters.isLoggedIn;
+    },
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch("logout").then(() => {
+        this.$router.push("/");
+      });
+    },
+  },
 };
 </script>
 
@@ -46,6 +64,10 @@ export default {
 
 .nav-item a {
   color: rgba(0, 0, 0, 0.84);
+}
+
+.nav-logout {
+  cursor: pointer;
 }
 
 @media only screen and (min-width: 992px) {

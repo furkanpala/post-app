@@ -16,8 +16,11 @@ export default {
   components: {
     Header,
     Main,
-    Footer
-  }
+    Footer,
+  },
+  created() {
+    this.$store.dispatch("checkAuth");
+  },
 };
 </script>
 

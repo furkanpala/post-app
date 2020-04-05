@@ -1,4 +1,4 @@
-package handlers
+package httphandlers
 
 import (
 	"encoding/json"
@@ -31,7 +31,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 	}
 
 	// Generate access token with 15 minutes of expire time
-	accessTokenString, err := jwttoken.GenerateToken(15*time.Minute, user.Username, env.AccessTokenSecret)
+	accessTokenString, err := jwttoken.GenerateToken(15*time.Second, user.Username, env.AccessTokenSecret)
 	if err != nil {
 		return &httperror.HTTPError{
 			Cause: err,
@@ -58,8 +58,8 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 
 	// Set headers according to OAuth 2.0
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "no-store")
-	w.Header().Set("Pragma", "no-cache")
+	// w.Header().Set("Cache-Control", "no-store")
+	// w.Header().Set("Pragma", "no-cache")
 	responseBody := response.SuccessfulLoginResponse{
 		AccessToken: accessTokenString,
 		TokenType:   "bearer",
@@ -72,7 +72,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 		Value:    refreshTokenString,
 		Expires:  time.Now().Add(168 * time.Hour),
 		HttpOnly: true,
-		Path:     "/token",
 	}
 	http.SetCookie(w, &cookie)
 	json.NewEncoder(w).Encode(responseBody)

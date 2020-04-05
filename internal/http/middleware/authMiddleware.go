@@ -6,16 +6,13 @@ import (
 
 	"github.com/furkanpala/post-app/internal/env"
 	httperror "github.com/furkanpala/post-app/internal/http/error"
-	"github.com/furkanpala/post-app/internal/http/handlers"
+	httphandlers "github.com/furkanpala/post-app/internal/http/handlers"
 	jwttoken "github.com/furkanpala/post-app/internal/http/token"
 	"github.com/gorilla/context"
 )
 
-func AuthMiddleware(next handlers.RouteHandler) handlers.RouteHandler {
-	return handlers.RouteHandler(func(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
-		// authorization := strings.Split(strings.Join(r.Header["Authorization"], ""), " ")
-		// if authorization
-
+func AuthMiddleware(next httphandlers.RouteHandler) httphandlers.RouteHandler {
+	return httphandlers.RouteHandler(func(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 		authorization := strings.Split(r.Header.Get("Authorization"), " ")
 
 		if len(authorization) != 2 {

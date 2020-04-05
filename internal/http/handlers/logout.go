@@ -1,4 +1,4 @@
-package handlers
+package httphandlers
 
 import (
 	"fmt"
@@ -71,7 +71,7 @@ func HandleLogout(w http.ResponseWriter, r *http.Request) *httperror.HTTPError {
 		Value:    "",
 		Expires:  time.Unix(0, 0),
 		HttpOnly: true,
-		Path:     "/token",
+		Path:     "/",
 	}
 	http.SetCookie(w, &newCookie)
 	return nil

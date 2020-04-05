@@ -1,4 +1,4 @@
-package handlers
+package httphandlers
 
 import (
 	"net/http"
@@ -19,27 +19,31 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) *httperror.HTTPError
 		return err
 	}
 
+	// Check username and password length
 	usernameLength, passwordLength := len(user.Username), len(user.Password)
-
-	// Check username length
+	errorMessage := ""
 	if usernameLength < 3 {
-		return &httperror.HTTPError{
-			Cause: nil,
-			Info: httperror.ErrorMessage{
-				Title:  "Too short username",
-				Detail: "Minimum 3 characters",
-			},
-			Code: 400,
+		errorMessage += "Too short username - Minimum 3 characters"
+	}
+	if passwordLength < 6 {
+		if errorMessage != "" {
+			errorMessage += "|"
 		}
+		errorMessage += "Too short password - Minimum 6 characters"
+	}
+	if usernameLength > 20 {
+		if errorMessage != "" {
+			errorMessage += "|"
+		}
+		errorMessage += "Too long password - Maximum 20 characters"
 	}
 
-	// Check password length
-	if passwordLength < 6 {
+	if errorMessage != "" {
 		return &httperror.HTTPError{
 			Cause: nil,
 			Info: httperror.ErrorMessage{
-				Title:  "Too short password",
-				Detail: "Minimum 6 characters",
+				Title:  "Invalid register credentials",
+				Detail: errorMessage,
 			},
 			Code: 400,
 		}
@@ -66,7 +70,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) *httperror.HTTPError
 				Title:  "User already exists",
 				Detail: "",
 			},
-			Code: 200,
+			Code: 409,
 		}
 	}
 

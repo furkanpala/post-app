@@ -176,14 +176,9 @@ func CountPosts() (int, error) {
 
 // GetAllPosts returns all the posts inside database
 func GetAllPosts() ([]core.Post, error) {
-	count, err := CountPosts()
-	if err != nil {
-		return nil, err
-	}
+	var posts []core.Post
 
-	posts := make([]core.Post, count)
-
-	rows, err := db.Query("SELECT * FROM posts")
+	rows, err := db.Query("SELECT * FROM posts ORDER BY date_added DESC")
 	if err != nil {
 		return nil, err
 	}
